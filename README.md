@@ -19,3 +19,6 @@ It will make executable file ```./run``` after which you can pass params and com
 
 # Commands
 - show list - list all credentials (only services)
+
+# Agenda
+1. Check for memory leaks and erros via valgrind

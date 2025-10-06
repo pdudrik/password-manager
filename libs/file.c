@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "parser.h"
 #include "file.h"
 
@@ -26,6 +27,7 @@ void add_credentials(credentials_t credentials) {
 }
 
 
+
 credentials_t *load_credentials_from_file(size_t *cred_len) {
 	FILE *file = fopen(CREDENTIALS_FILE_PATH, "r");
 
@@ -45,6 +47,7 @@ credentials_t *load_credentials_from_file(size_t *cred_len) {
 
 	credentials_t *credentials = (credentials_t *) malloc(sizeof(credentials_t));
 	//(*cred_len)++;
+	
 	char row[100];
 	while (fgets(row, sizeof(row), file)) {
 		printf("ROW: %s\n", row);
@@ -53,11 +56,84 @@ credentials_t *load_credentials_from_file(size_t *cred_len) {
 		}
 		(*cred_len)++;
 		credentials = realloc(credentials, ((*cred_len)) * sizeof(credentials_t));
-		credentials[(*cred_len)-1] = parse_row_data(row);
+		size_t row_len = 0;
+		char **row_data = parse_string(row, "-", &row_len);
+
+		credentials[(*cred_len)-1].service = strdup(row_data[0]);
+		credentials[(*cred_len)-1].username = strdup(row_data[1]);
+		credentials[(*cred_len)-1].password = strdup(row_data[2]);
+		
+		for (int i=0; i<row_len; i++) {
+			free(row_data[i]);
+		}
+		free(row_data);
+		
 	}
 	fclose(file);
 	
 	return credentials;
 }
+
+
+void free_credentials_array(credentials_t *credentials, size_t len) {
+	for (int i=0; i<len; i++) {
+		free(credentials[i].service);
+		free(credentials[i].username);
+		free(credentials[i].password);
+	}
+	free(credentials);
+}
+
+
+bool load_specific_credentials(char *service_name, credentials_t *credentials) {
+	FILE *file = fopen(CREDENTIALS_FILE_PATH, "r");
+	bool match = false;
+
+	if (file == NULL) {
+		printf("File does not exists\n");
+		fclose(file);
+		return match;
+	}
+
+	int c = fgetc(file);
+	if (isspace((unsigned char) c)) {
+		printf("File is empty\n");
+		fclose(file);
+		return match;
+	}
+	ungetc(c, file);
+	
+	char row[100];
+	while (!match) {
+		char *temp = fgets(row, sizeof(row), file);
+		if (feof(file)) {
+			printf("ROW IS empty\n");
+			fclose(file);
+			return match;
+		}
+		
+		size_t size = 0;
+		char **row_data = parse_string(row, "-", &size);
+		if (!strcmp(row_data[0], service_name)) {
+			credentials->service = strdup(row_data[0]);
+			credentials->username = strdup(row_data[1]);
+			credentials->password = strdup(row_data[2]);
+			match = true;
+		}
+	
+		for (int i=0; i<size; i++) {
+			free(row_data[i]);
+		}
+		free(row_data);
+	
+	}
+	fclose(file);
+	
+
+	return match;
+}
+
+
+
 
 

@@ -66,5 +66,6 @@ arg_t *parse_input(int argc, char** argv, int* args_len);
 void free_args(arg_t *args);
 void print_parsed_input(arg_t *args, int len);
 credentials_t parse_row_data(char* row);
+char **parse_string(char *row, char *delim, size_t *size); 
 
 #endif

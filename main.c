@@ -23,18 +23,21 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	print_parsed_input(args, args_len);	
-	credentials_t credentials;
+	print_parsed_input(args, args_len);
+	//credentials_t credentials;
 
 	switch (args[0].param_key) {
+		/*
 		case USERNAME_TYPE:
 		case PASSWORD_TYPE:
 		case SERVICE_TYPE:
+			credentials_t credentials;
 			fill_credentials(&credentials, args);
 			add_credentials(credentials);
 			printf("Credentials for \"%s\" were added sucessfully!\n",
 					credentials.service);
 			break;
+		*/
 		/*
 		case ADD_TYPE:
 			add_credentials(credentials);
@@ -55,21 +58,38 @@ int main(int argc, char **argv) {
 			}
 
 			for (size_t i=0; i<cred_len; i++) {
-				printf("- %s\n",	credentials[i].service);
+				printf("- %s\n", credentials[i].service);
 			}
 			printf("\n");
+			free_credentials_array(credentials, cred_len);
 			break;
 
 		case SHOW_SPECIFIC_SERVICE_TYPE:
 			// show specific credentials by service
+			credentials_t target;
+			bool loaded_credentials = load_specific_credentials(args[0].value, &target);	
+			if (loaded_credentials == false) {
+				printf("Credentials for service \"%s\" were not found!\n",
+						args[0].value);
+				break;
+			}
+			
+			printf("FOUND MATCH!\nService: %s\nUsername: %s\nPassword: %s\n",
+					target.service, target.username, target.password);
+			
+			free(target.service);
+			free(target.username);	
+			free(target.password);
 			break;
 	}
 	
+
+
 //	printf("service= %s, username=%s, password=%s\n",
 //		   credentials.service, credentials.username, credentials.password);
 	
 	free_args(args);
-	
+
 	return 0;
 }
 

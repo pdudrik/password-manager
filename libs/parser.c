@@ -144,3 +144,18 @@ credentials_t parse_row_data(char* row) {
 
 	return credentials;
 }
+
+
+char **parse_string(char *row, char *delim, size_t *size) {
+	char **out = NULL;
+	char *token = strtok(row, delim);
+
+	do {
+		(*size)++;
+		out = realloc(out, (*size) * sizeof(char *));
+		out[(*size)-1] = strdup(token);
+	} while ((token = strtok(NULL, delim)) != NULL);
+	
+	return out;
+}
+

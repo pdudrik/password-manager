@@ -27,23 +27,17 @@ int main(int argc, char **argv) {
 	//credentials_t credentials;
 
 	switch (args[0].param_key) {
-		/*
+		
 		case USERNAME_TYPE:
 		case PASSWORD_TYPE:
 		case SERVICE_TYPE:
-			credentials_t credentials;
-			fill_credentials(&credentials, args);
-			add_credentials(credentials);
+			credentials_t new_credentials;
+			fill_credentials(&new_credentials, args);
+			add_credentials(new_credentials);
 			printf("Credentials for \"%s\" were added sucessfully!\n",
-					credentials.service);
+					new_credentials.service);
 			break;
-		*/
-		/*
-		case ADD_TYPE:
-			add_credentials(credentials);
-			break;
-		*/
-
+		
 		case DELETE_TYPE:
 			// delete specific credentials
 			break;

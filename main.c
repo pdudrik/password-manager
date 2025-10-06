@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "parser.h"
 #include "command.h"
 #include "file.h"
@@ -31,6 +32,7 @@ int main(int argc, char **argv) {
 		case USERNAME_TYPE:
 		case PASSWORD_TYPE:
 		case SERVICE_TYPE:
+			// add new credentials
 			credentials_t new_credentials;
 			fill_credentials(&new_credentials, args);
 			add_credentials(new_credentials);
@@ -38,9 +40,38 @@ int main(int argc, char **argv) {
 					new_credentials.service);
 			break;
 		
-		case DELETE_TYPE:
-			// delete specific credentials
+		case DELETE_TYPE: {
+			printf("delete %s\n", args[0].value);
+			credentials_t target;
+			bool loaded_credentials = load_specific_credentials(args[0].value, &target);
+			if (!loaded_credentials) {
+				printf("Credentials for service \"%s\" not found\n", args[0].value);
+				break;
+			}
+
+			size_t row_len = strlen(target.service) + strlen(target.username) +
+							  strlen(target.password) + 3; // +2 delims, +1 \0
+			char *target_row = (char *) malloc(row_len * sizeof(char));
+			strcpy(target_row, target.service);
+			strcat(target_row, "-");
+			strcat(target_row, target.username);
+			strcat(target_row, "-");
+			strcat(target_row, target.password);
+
+			free(target.service);
+			free(target.username);
+			free(target.password);
+			
+			printf("target_row=%s\n", target_row);			
+
+			bool deleted = delete_specific_credentials(target_row);
+			printf("Deleted %s successfully: %s\n", target_row,
+					deleted ? "true" : "false");
+
+			free(target_row);
+			
 			break;
+		}
 
 		case SHOW_LIST_TYPE:
 			// print all credential services
@@ -58,7 +89,7 @@ int main(int argc, char **argv) {
 			free_credentials_array(credentials, cred_len);
 			break;
 
-		case SHOW_SPECIFIC_SERVICE_TYPE:
+		case SHOW_SPECIFIC_SERVICE_TYPE: {
 			// show specific credentials by service
 			credentials_t target;
 			bool loaded_credentials = load_specific_credentials(args[0].value, &target);	
@@ -75,6 +106,7 @@ int main(int argc, char **argv) {
 			free(target.username);	
 			free(target.password);
 			break;
+		}
 	}
 	
 

@@ -134,6 +134,66 @@ bool load_specific_credentials(char *service_name, credentials_t *credentials) {
 }
 
 
+bool delete_specific_credentials(char *target_row) {
+	FILE *origin, *temp_file;
+	origin = fopen(CREDENTIALS_FILE_PATH, "r");
+
+	if (origin == NULL) {
+		printf("File does not exists\n");
+		//fclose(origin);
+		return false;
+	}
+
+	int c = fgetc(origin);
+	if (isspace((unsigned char) c)) {
+		printf("File is empty\n");
+		fclose(origin);
+		return false;
+	}
+	ungetc(c, origin);
+	
+	temp_file = fopen(CREDENTIALS_TEMP_FILE_PATH, "w");
+
+	if (temp_file == NULL) {
+		printf("File does not exists\n");
+		fclose(origin);
+		return false;
+	}
+
+
+	size_t origin_file_size = 0;
+//	char **origin_file_data;
+	char row[100];
+	while (fgets(row, sizeof(row), origin)) {
+		origin_file_size++;
+//		origin_file_data = realloc(origin_file_data,
+//								   origin_file_size * sizeof(char *));
+//		origin_file_data[origin_file_size-1] = strdup(row);
+		
+		// exclude specified credentials
+		if (strcmp(row, target_row)) {
+			fputs(row, temp_file);
+		}
+	}
+
+	fclose(origin);
+	fclose(temp_file);
+	
+	// stdlib.h functions
+	remove(CREDENTIALS_FILE_PATH);	
+	rename(CREDENTIALS_TEMP_FILE_PATH, CREDENTIALS_FILE_PATH);
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

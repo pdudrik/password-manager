@@ -51,6 +51,9 @@ arg_t* parse_input(int argc, char** argv, int* args_len) {
 			else if (!strcmp("show", argv[i])) {
 				new_arg.param_key = SHOW_SPECIFIC_SERVICE_TYPE;
 			}
+			else if (!strcmp("delete", argv[i])) {
+				new_arg.param_key = DELETE_TYPE;
+			}
 			else {
 				fprintf(stderr, "Unknown error during comparison: %s and %s\n", argv[i], argv[i+1]);
 				return NULL;
